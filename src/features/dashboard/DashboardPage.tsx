@@ -1,4 +1,16 @@
-import { ArrowRight, CircleCheckBig, DatabaseZap, ShieldAlert } from 'lucide-react'
+import {
+  ArrowRight,
+  CircleCheckBig,
+  DatabaseZap,
+  ShieldAlert,
+  GraduationCap,
+  Users,
+  UserCheck,
+  CalendarCheck2,
+  TrendingUp,
+  Wallet,
+  AlertCircle,
+} from 'lucide-react'
 import { Badge } from '@/components/Badge'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
@@ -11,36 +23,43 @@ const metrics = [
     label: 'Total Students',
     value: 'Pending',
     hint: 'Waiting for the first Supabase sync.',
+    icon: <GraduationCap className="h-5 w-5" />,
   },
   {
     label: 'Active Groups',
     value: 'Pending',
     hint: 'Groups will appear after the schema is connected.',
+    icon: <Users className="h-5 w-5" />,
   },
   {
     label: 'Teachers',
     value: 'Pending',
     hint: 'Staff records are modeled in the database plan.',
+    icon: <UserCheck className="h-5 w-5" />,
   },
   {
     label: "Today's Attendance",
     value: 'Pending',
     hint: 'Attendance capture will activate in phase 7.',
+    icon: <CalendarCheck2 className="h-5 w-5" />,
   },
   {
     label: 'Attendance Rate',
     value: 'Pending',
     hint: 'Will be calculated from lesson-level attendance rows.',
+    icon: <TrendingUp className="h-5 w-5" />,
   },
   {
     label: 'Monthly Revenue',
     value: 'Pending',
     hint: 'Payments and recurring reminders come later in the roadmap.',
+    icon: <Wallet className="h-5 w-5" />,
   },
   {
     label: 'Outstanding Payments',
     value: 'Pending',
     hint: 'Live balances will populate once payment records exist.',
+    icon: <AlertCircle className="h-5 w-5" />,
   },
 ]
 
