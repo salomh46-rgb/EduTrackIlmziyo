@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --bg: 243 246 252;
+  --surface: 255 255 255;
+  --surface-soft: 248 250 252;
+  --surface-strong: 226 232 240;
+  --text: 15 23 42;
+  --muted: 71 85 105;
+  --border: 226 232 240;
+  --primary: 37 99 235;
+  --primary-strong: 29 78 216;
+  --accent: 14 165 233;
+  --success: 22 163 74;
+  --warning: 217 119 6;
+  --danger: 220 38 38;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: 2 6 23;
+  --surface: 15 23 42;
+  --surface-soft: 30 41 59;
+  --surface-strong: 51 65 85;
+  --text: 226 232 240;
+  --muted: 148 163 184;
+  --border: 51 65 85;
+  --primary: 96 165 250;
+  --primary-strong: 147 197 253;
+  --accent: 56 189 248;
+  --success: 74 222 128;
+  --warning: 250 204 21;
+  --danger: 248 113 113;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Manrope', 'Aptos', 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 30%),
+    linear-gradient(180deg, rgb(var(--bg)) 0%, rgb(var(--bg)) 100%);
+  color: rgb(var(--text));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(59, 130, 246, 0.22);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
