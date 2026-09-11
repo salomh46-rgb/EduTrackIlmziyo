@@ -25,8 +25,20 @@ export function RequireAuth({ children }: RequireAuthProps) {
   if (status === 'error') {
     return (
       <StateScreen
-        title="Authentication unavailable"
-        description="We could not initialize the authentication layer."
+        title="Autentifikatsiya ulanmadi"
+        description="Supabase bilan aloqa o'rnatilmadi yoki tarmoq xatosi yuz berdi. Tizimni ko'rish uchun to'g'ridan-to'g'ri Demo rejimiga o'tishingiz mumkin."
+        action={
+          <a
+            href="/dashboard"
+            onClick={(e) => {
+              e.preventDefault()
+              window.location.reload()
+            }}
+            className="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-5 py-2.5 font-medium text-white shadow-lg transition hover:bg-sky-600 active:scale-95"
+          >
+            🚀 Demo Rejimida Boshlash
+          </a>
+        }
       />
     )
   }
