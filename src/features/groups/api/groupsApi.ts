@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { recordAuditEvent } from '@/features/shared/api/audit'
+import { MOCK_GROUPS, MOCK_STUDENTS, MOCK_TEACHERS } from '@/lib/mockData'
 import type {
   GroupDetail,
   GroupFormValues,
@@ -131,7 +132,17 @@ export async function listGroups(
   filter?: { search?: string; status?: string },
 ): Promise<GroupListItem[]> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    let result = [...MOCK_GROUPS]
+    if (filter?.status && filter.status !== 'ALL') {
+      result = result.filter((g) => g.status === filter.status)
+    }
+    if (filter?.search && filter.search.trim()) {
+      const term = filter.search.toLowerCase()
+      result = result.filter(
+        (g) => g.name.toLowerCase().includes(term) || g.subject.toLowerCase().includes(term) || (g.room && g.room.toLowerCase().includes(term))
+      )
+    }
+    return result
   }
 
   let query = supabase
@@ -193,7 +204,21 @@ export async function listGroups(
 
 export async function getGroupDetail(orgId: string, groupId: string): Promise<GroupDetail | null> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    const found = MOCK_GROUPS.find((g) => g.id === groupId) || MOCK_GROUPS[0]
+    return {
+      ...found,
+      students: MOCK_STUDENTS.map((st, i) => ({
+        id: `gs-${i}`,
+        student_id: st.id,
+        first_name: st.first_name,
+        last_name: st.last_name,
+        phone: st.phone,
+        avatar_url: st.avatar_url,
+        joined_at: '2026-08-01',
+        left_at: null,
+        status: 'ACTIVE',
+      })),
+    }
   }
 
   const { data, error } = await supabase
@@ -542,7 +567,12 @@ export async function listAvailableStudentsForGroup(
   groupId: string,
 ): Promise<Array<{ id: string; first_name: string; last_name: string; phone: string | null }>> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return MOCK_STUDENTS.map((s) => ({
+      id: s.id,
+      first_name: s.first_name,
+      last_name: s.last_name,
+      phone: s.phone,
+    }))
   }
 
   const { data: enrolled } = await supabase
@@ -579,7 +609,12 @@ export async function listTeachersForSelect(
   orgId: string,
 ): Promise<Array<{ id: string; first_name: string; last_name: string; specialization: string | null }>> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return MOCK_TEACHERS.map((t) => ({
+      id: t.id,
+      first_name: t.first_name,
+      last_name: t.last_name,
+      specialization: t.specialization,
+    }))
   }
 
   const { data, error } = await supabase

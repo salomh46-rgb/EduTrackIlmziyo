@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { recordAuditEvent } from '@/features/shared/api/audit'
+import { MOCK_STUDENTS } from '@/lib/mockData'
 import type {
   RelationshipType,
   StudentDetail,
@@ -204,7 +205,20 @@ export function getFriendlyStudentError(error: PostgrestError | null) {
 
 export async function listStudents(params: ListStudentsParams) {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    let rows = [...MOCK_STUDENTS]
+    if (params.status !== 'ALL') {
+      rows = rows.filter((s) => s.status === params.status)
+    }
+    if (params.search && params.search.trim()) {
+      const q = params.search.trim().toLowerCase()
+      rows = rows.filter(
+        (s) =>
+          s.first_name.toLowerCase().includes(q) ||
+          s.last_name.toLowerCase().includes(q) ||
+          (s.phone && s.phone.includes(q)),
+      )
+    }
+    return { rows, totalCount: rows.length }
   }
 
   const { organizationId, page, pageSize, search, status, groupId } = params
@@ -267,7 +281,7 @@ export async function listStudents(params: ListStudentsParams) {
 
 export async function getStudent(organizationId: string, studentId: string): Promise<StudentListItem | null> {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    return MOCK_STUDENTS.find((s) => s.id === studentId) ?? MOCK_STUDENTS[0]
   }
 
   const { data, error } = await supabase
@@ -287,7 +301,38 @@ export async function getStudent(organizationId: string, studentId: string): Pro
 
 export async function getStudentDetail(organizationId: string, studentId: string): Promise<StudentDetail | null> {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    const s = MOCK_STUDENTS.find((item) => item.id === studentId) ?? MOCK_STUDENTS[0]
+    return {
+      ...s,
+      parents: s.primary_parent
+        ? [
+            {
+              link_id: 'link-1',
+              id: s.primary_parent.id,
+              relationship_type: 'FATHER' as const,
+              is_primary: true,
+              first_name: s.primary_parent.first_name,
+              last_name: s.primary_parent.last_name,
+              phone: s.primary_parent.phone,
+              email: null,
+              notification_enabled: true,
+              telegram_verified: true,
+            },
+          ]
+        : [],
+      groups: s.primary_group
+        ? [
+            {
+              id: s.primary_group.id,
+              name: s.primary_group.name,
+              subject: s.primary_group.subject,
+              status: 'ACTIVE',
+              joined_at: '2026-08-01',
+              left_at: null,
+            },
+          ]
+        : [],
+    }
   }
 
   const { data, error } = await supabase

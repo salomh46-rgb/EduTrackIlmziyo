@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { recordAuditEvent } from '@/features/shared/api/audit'
+import { MOCK_EXAMS, MOCK_LEADERBOARD, MOCK_GROUPS } from '@/lib/mockData'
 import type {
   ExamDetail,
   ExamFormValues,
@@ -29,7 +30,12 @@ export async function listGroupsForExams(
   orgId: string,
 ): Promise<Array<{ id: string; name: string; subject: string; teacher_id: string | null }>> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return MOCK_GROUPS.map((g) => ({
+      id: g.id,
+      name: g.name,
+      subject: g.subject,
+      teacher_id: g.teacher_id,
+    }))
   }
 
   const { data, error } = await supabase
@@ -51,7 +57,10 @@ export async function listExams(
   groupId?: string,
 ): Promise<ExamListItem[]> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    if (groupId) {
+      return MOCK_EXAMS.filter((e) => e.group_id === groupId)
+    }
+    return MOCK_EXAMS
   }
 
   let query = supabase
@@ -125,7 +134,37 @@ export async function getExamDetail(
   examId: string,
 ): Promise<ExamDetail | null> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    const exam = MOCK_EXAMS.find((e) => e.id === examId) || MOCK_EXAMS[0]
+    return {
+      ...exam,
+      teacher_id: 'tch-1',
+      results: [
+        {
+          id: 'res-1',
+          student_id: 'std-1',
+          student_name: 'Jamshid Rasulov',
+          first_name: 'Jamshid',
+          last_name: 'Rasulov',
+          avatar_url: null,
+          score: 95,
+          percentage: 95,
+          grade: 'A',
+          teacher_comment: "A'lo darajada ishlangan",
+        },
+        {
+          id: 'res-2',
+          student_id: 'std-2',
+          student_name: 'Jasur Alimov',
+          first_name: 'Jasur',
+          last_name: 'Alimov',
+          avatar_url: null,
+          score: 88,
+          percentage: 88,
+          grade: 'B',
+          teacher_comment: 'Yaxshi natija',
+        },
+      ],
+    }
   }
 
   // 1. Fetch exam
@@ -258,7 +297,22 @@ export async function createExam(
   actorProfileId?: string,
 ): Promise<ExamListItem> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return {
+      id: `exm-${Date.now()}`,
+      organization_id: orgId,
+      group_id: values.group_id,
+      group_name: 'Guruh',
+      teacher_id: values.teacher_id || null,
+      teacher_name: "O'qituvchi",
+      title: values.title.trim(),
+      subject: values.subject.trim(),
+      exam_date: values.exam_date,
+      maximum_score: Number(values.maximum_score) || 100,
+      results_count: 0,
+      average_score: 0,
+      highest_score: 0,
+      created_at: new Date().toISOString(),
+    }
   }
 
   const payload = {
@@ -338,7 +392,7 @@ export async function recordExamResultsBulk(
   actorProfileId?: string,
 ): Promise<{ savedCount: number }> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return { savedCount: results.length }
   }
 
   // 1. Get exam maximum score
@@ -400,7 +454,7 @@ export async function getExamLeaderboard(
   examId: string,
 ): Promise<StudentExamLeaderboard[]> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return MOCK_LEADERBOARD
   }
 
   const { data: exam } = await supabase

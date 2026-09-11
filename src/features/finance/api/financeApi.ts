@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase/client'
 import { recordAuditEvent } from '@/features/shared/api/audit'
 import { toTiyin } from '@/features/finance/services/paymentGateways'
+import { MOCK_PAYMENTS, MOCK_FINANCE_STATS, MOCK_DEBTORS } from '@/lib/mockData'
 import type {
   DebtSummary,
   FinanceStats,
@@ -84,7 +85,22 @@ export async function listPayments(
   filter?: PaymentFilter,
 ): Promise<{ rows: PaymentRecord[]; totalCount: number }> {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    let list = [...MOCK_PAYMENTS]
+    if (filter?.status && filter.status !== 'ALL') {
+      list = list.filter((p) => p.status === filter.status)
+    }
+    if (filter?.method && filter.method !== 'ALL') {
+      list = list.filter((p) => p.method === filter.method)
+    }
+    if (filter?.search && filter.search.trim()) {
+      const q = filter.search.trim().toLowerCase()
+      list = list.filter(
+        (p) =>
+          p.student?.first_name.toLowerCase().includes(q) ||
+          p.student?.last_name.toLowerCase().includes(q),
+      )
+    }
+    return { rows: list, totalCount: list.length }
   }
 
   const page = filter?.page ?? 0
@@ -188,7 +204,21 @@ export async function createPayment(
   actorProfileId?: string,
 ): Promise<PaymentRecord> {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    const newRecord: PaymentRecord = {
+      ...MOCK_PAYMENTS[0],
+      id: `pay-${Date.now()}`,
+      student_id: input.student_id,
+      amount: input.amount,
+      amount_in_tiyin: toTiyin(input.amount),
+      payment_date: input.payment_date || new Date().toISOString().split('T')[0],
+      due_date: input.due_date || null,
+      status: input.status,
+      method: input.method,
+      note: input.note || null,
+      receipt_number: `KV-${Date.now().toString().slice(-8)}`,
+      transaction_id: `TX-${Date.now().toString().slice(-10)}`,
+    }
+    return newRecord
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -328,7 +358,7 @@ export async function createPayment(
  */
 export async function getFinanceOverview(orgId: string): Promise<FinanceStats> {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    return MOCK_FINANCE_STATS
   }
 
   const { data, error } = await supabase
@@ -412,7 +442,7 @@ export async function getFinanceOverview(orgId: string): Promise<FinanceStats> {
  */
 export async function listDebtors(orgId: string): Promise<DebtSummary[]> {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    return MOCK_DEBTORS
   }
 
   // Fetch payments that are not PAID or REFUNDED

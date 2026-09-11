@@ -28,7 +28,13 @@ export function useWorkspaceOrganization() {
 
     async function loadOrganization() {
       if (!isSupabaseConfigured || !profile?.id || !supabase) {
-        setOrganization(null)
+        setOrganization({
+          id: 'org-ilmziyo',
+          name: "Ilmziyo O'quv Markazi",
+          slug: 'ilmziyo',
+          timezone: 'Asia/Tashkent',
+          status: 'ACTIVE',
+        })
         setLoading(false)
         return
       }

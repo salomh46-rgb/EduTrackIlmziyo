@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { recordAuditEvent } from '@/features/shared/api/audit'
+import { MOCK_TEACHERS } from '@/lib/mockData'
 import type { TeacherDetail, TeacherFormValues, TeacherListItem, TeacherStatus } from '@/features/teachers/types'
 
 const teacherSelect = `
@@ -82,7 +83,20 @@ export async function listTeachers(
   params: { page: number; pageSize: number; search: string; status: TeacherStatus | 'ALL' },
 ) {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    let rows = [...MOCK_TEACHERS]
+    if (params.status !== 'ALL') {
+      rows = rows.filter((t) => t.status === params.status)
+    }
+    if (params.search.trim()) {
+      const q = params.search.trim().toLowerCase()
+      rows = rows.filter(
+        (t) =>
+          t.first_name.toLowerCase().includes(q) ||
+          t.last_name.toLowerCase().includes(q) ||
+          (t.specialization && t.specialization.toLowerCase().includes(q)),
+      )
+    }
+    return { rows, totalCount: rows.length }
   }
 
   const from = params.page * params.pageSize
@@ -118,7 +132,13 @@ export async function listTeachers(
 
 export async function getTeacherDetail(organizationId: string, teacherId: string) {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    const t = MOCK_TEACHERS.find((item) => item.id === teacherId) ?? MOCK_TEACHERS[0]
+    return {
+      ...t,
+      groups: [
+        { id: 'grp-1', name: 'Matematika Intensive (G-12)', subject: 'Matematika', status: 'ACTIVE' },
+      ],
+    }
   }
 
   const { data, error } = await supabase

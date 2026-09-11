@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { recordAuditEvent } from '@/features/shared/api/audit'
+import { MOCK_PARENTS } from '@/lib/mockData'
 import type { ParentDetail, ParentFormValues, ParentListItem, ParentStudentSummary } from '@/features/parents/types'
 import type { RelationshipType } from '@/features/students/types'
 
@@ -111,9 +112,22 @@ export function formatParentError(error: PostgrestError | null) {
   return getFriendlyParentError(error)
 }
 
-export async function listParents(organizationId: string, params: { page: number; pageSize: number; search: string }) {
+export async function listParents(
+  organizationId: string,
+  params: { page: number; pageSize: number; search: string },
+) {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    let rows = [...MOCK_PARENTS]
+    if (params.search.trim()) {
+      const q = params.search.trim().toLowerCase()
+      rows = rows.filter(
+        (p) =>
+          p.first_name.toLowerCase().includes(q) ||
+          p.last_name.toLowerCase().includes(q) ||
+          (p.phone && p.phone.includes(q)),
+      )
+    }
+    return { rows, totalCount: rows.length }
   }
 
   const from = params.page * params.pageSize
@@ -145,7 +159,22 @@ export async function listParents(organizationId: string, params: { page: number
 
 export async function getParentDetail(organizationId: string, parentId: string) {
   if (!supabase) {
-    throw new Error('Supabase is not configured.')
+    const p = MOCK_PARENTS.find((item) => item.id === parentId) ?? MOCK_PARENTS[0]
+    return {
+      ...p,
+      children: [
+        {
+          link_id: 'plink-1',
+          id: 'std-1',
+          first_name: 'Jamshid',
+          last_name: 'Rasulov',
+          phone: '+998 90 123 45 67',
+          relationship_type: 'FATHER' as const,
+          is_primary: true,
+          group_name: 'Matematika Intensive (G-12)',
+        },
+      ],
+    }
   }
 
   const { data, error } = await supabase

@@ -155,8 +155,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const client = supabase
 
     if (!client) {
-      setStatus('error')
-      setProblem('config-missing')
+      // Offline / Demo Workspace Mode (Jasper Ilmziyo Admin)
+      const demoProfile: AuthProfile = {
+        id: 'profile-qobiljon',
+        full_name: 'Qobiljon Rasulov',
+        avatar_url: null,
+        role: 'OWNER',
+        created_at: '2026-01-01T00:00:00.000Z',
+        updated_at: new Date().toISOString(),
+      }
+      setProfile(demoProfile)
+      setProfileStatus('ready')
+      setProblem(null)
+      setStatus('authenticated')
       setAuthReady(true)
       return
     }

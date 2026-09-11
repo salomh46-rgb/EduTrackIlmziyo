@@ -1,6 +1,7 @@
 import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase/client'
 import { recordAuditEvent } from '@/features/shared/api/audit'
+import { MOCK_GROUPS, MOCK_ATTENDANCE_ROSTER } from '@/lib/mockData'
 import type {
   AttendanceRecord,
   AttendanceRosterStudent,
@@ -21,7 +22,12 @@ export async function listGroupsForAttendance(
   orgId: string,
 ): Promise<Array<{ id: string; name: string; subject: string; room: string | null }>> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return MOCK_GROUPS.map((g) => ({
+      id: g.id,
+      name: g.name,
+      subject: g.subject,
+      room: g.room,
+    }))
   }
 
   const { data, error } = await supabase
@@ -43,7 +49,32 @@ export async function listLessonsForDate(
   date: string,
 ): Promise<LessonWithAttendance[]> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return [
+      {
+        id: 'lsn-1',
+        group_id: 'grp-1',
+        group_name: 'Matematika Intensive (G-12)',
+        subject: 'Matematika',
+        teacher_id: 'tch-1',
+        teacher_name: 'Sardor Qodirov',
+        starts_at: `${date}T09:00:00Z`,
+        ends_at: `${date}T10:30:00Z`,
+        status: 'SCHEDULED',
+        room: '104-xona',
+      },
+      {
+        id: 'lsn-2',
+        group_id: 'grp-2',
+        group_name: 'IELTS 7.5+ Masterclass',
+        subject: 'Ingliz tili',
+        teacher_id: 'tch-2',
+        teacher_name: 'Madina Umarova',
+        starts_at: `${date}T11:00:00Z`,
+        ends_at: `${date}T12:30:00Z`,
+        status: 'SCHEDULED',
+        room: '202-xona',
+      },
+    ]
   }
 
   const startIso = `${date}T00:00:00.000Z`
@@ -104,7 +135,10 @@ export async function getGroupAttendanceRoster(
   existingLessonId: string | null
 }> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return {
+      students: MOCK_ATTENDANCE_ROSTER,
+      existingLessonId: 'lsn-1',
+    }
   }
 
   // 1. Fetch enrolled active students in group
@@ -220,7 +254,11 @@ export async function recordAttendanceBulk(
   actorProfileId?: string,
 ): Promise<{ savedCount: number; absentNotificationsQueued: number }> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    const absentCount = input.records.filter((r) => r.status === 'ABSENT').length
+    return {
+      savedCount: input.records.length,
+      absentNotificationsQueued: absentCount,
+    }
   }
 
   const { groupId, lessonDate, records } = input
@@ -416,7 +454,16 @@ export async function getAttendanceSummary(
   endDate: string,
 ): Promise<AttendanceSummary> {
   if (!supabase) {
-    throw new Error('Supabase ulanmagan.')
+    return {
+      total: 48,
+      present: 42,
+      late: 3,
+      excused: 1,
+      absent: 2,
+      rate: 94,
+      period_start: startDate,
+      period_end: endDate,
+    }
   }
 
   const { data, error } = await supabase
