@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import {
   ArrowRight,
   CircleCheckBig,
   DatabaseZap,
+  HelpCircle,
   ShieldAlert,
   GraduationCap,
   Users,
@@ -17,6 +19,8 @@ import { Card } from '@/components/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { PageHeader } from '@/components/PageHeader'
 import { StatCard } from '@/components/StatCard'
+import { OnboardingStepsBanner } from '@/components/OnboardingStepsBanner'
+import { OnboardingGuideModal } from '@/components/OnboardingGuideModal'
 
 const metrics = [
   {
@@ -88,6 +92,8 @@ const emptySections = [
 ]
 
 export function DashboardPage() {
+  const [guideModalOpen, setGuideModalOpen] = useState(false)
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -96,15 +102,29 @@ export function DashboardPage() {
         description="This dashboard is intentionally honest: it confirms the shell, surfaces readiness, and leaves the business modules empty until their own phases land."
         actions={
           <>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setGuideModalOpen(true)}
+              className="bg-gradient-to-r from-sky-500/10 to-blue-500/10 border-sky-500/30 text-sky-400 hover:text-sky-300"
+            >
+              <HelpCircle className="mr-2 h-4 w-4 text-sky-400" />
+              Onboarding Wizard
+            </Button>
             <Button type="button">
               Review architecture
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button type="button" variant="secondary">
-              Open implementation plan
-            </Button>
           </>
         }
+      />
+
+      {/* Onboarding Wizard 3-Step Setup Banner */}
+      <OnboardingStepsBanner onOpenGuide={() => setGuideModalOpen(true)} />
+
+      <OnboardingGuideModal
+        isOpen={guideModalOpen}
+        onClose={() => setGuideModalOpen(false)}
       />
 
       <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">

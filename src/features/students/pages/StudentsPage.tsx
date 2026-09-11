@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Filter, Plus, Search, Users } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Download, Filter, Plus, Search, Upload, Users } from 'lucide-react'
 import { Badge } from '@/components/Badge'
 import { Button } from '@/components/Button'
 import { Card } from '@/components/Card'
@@ -24,6 +24,8 @@ import {
 } from '@/features/students/api/studentsApi'
 import type { StudentFormValues, StudentListItem, StudentStatus } from '@/features/students/types'
 import { StudentFormDrawer } from '@/features/students/components/StudentFormDrawer'
+import { exportStudentsToCsv } from '@/features/students/utils/studentCsvHelper'
+import { StudentImportModal } from '@/features/students/components/StudentImportModal'
 
 const pageSize = 10
 const statusOptions: Array<StudentStatus | 'ALL'> = ['ALL', 'ACTIVE', 'INACTIVE', 'FROZEN', 'GRADUATED', 'LEFT']
@@ -91,6 +93,8 @@ export function StudentsPage() {
   const [drawerError, setDrawerError] = useState<string | null>(null)
   const [selectedStudent, setSelectedStudent] = useState<StudentListItem | null>(null)
   const [archiveTarget, setArchiveTarget] = useState<StudentListItem | null>(null)
+  const [importModalOpen, setImportModalOpen] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -254,6 +258,30 @@ export function StudentsPage() {
     }
   }
 
+  const handleExportCsv = async () => {
+    if (!organization?.id) return
+    setIsExporting(true)
+    try {
+      if (totalCount > pageSize) {
+        const result = await listStudents({
+          organizationId: organization.id,
+          page: 0,
+          pageSize: 1000,
+          search,
+          status,
+          groupId,
+        })
+        exportStudentsToCsv(result.rows)
+      } else {
+        exportStudentsToCsv(rows)
+      }
+    } catch {
+      exportStudentsToCsv(rows)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   if (!isSupabaseConfigured) {
     return (
       <StateScreen
@@ -284,12 +312,31 @@ export function StudentsPage() {
         description="Browse students, filter by status or group, open detail records, and manage parent links without leaving the CRM."
         actions={
           <>
-            <Button type="button" variant="secondary" onClick={() => setPage((current) => Math.max(0, current - 1))} disabled={page === 0 || loading}>
-              <ArrowLeft className="h-4 w-4" />
-              Previous
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleExportCsv}
+              disabled={rows.length === 0 || isExporting}
+              className="rounded-xl font-bold"
+            >
+              <Download className="mr-1.5 h-4 w-4 text-emerald-500" />
+              {isExporting ? 'Eksport qilinmoqda...' : 'Eksport (CSV)'}
             </Button>
-            <Button type="button" onClick={openCreate}>
-              <Plus className="h-4 w-4" />
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setImportModalOpen(true)}
+              className="rounded-xl font-bold text-sky-400 border-sky-500/30 hover:border-sky-500/60"
+            >
+              <Upload className="mr-1.5 h-4 w-4" />
+              Import (CSV)
+            </Button>
+            <Button
+              type="button"
+              onClick={openCreate}
+              className="bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold shadow-md shadow-sky-500/20"
+            >
+              <Plus className="mr-1.5 h-4 w-4" />
               Add student
             </Button>
           </>
@@ -522,6 +569,16 @@ export function StudentsPage() {
         busy={drawerBusy}
         confirmLabel="Archive"
       />
+
+      {profile?.id && organization?.id && (
+        <StudentImportModal
+          isOpen={importModalOpen}
+          onClose={() => setImportModalOpen(false)}
+          organizationId={organization.id}
+          actorProfileId={profile.id}
+          onSuccess={refreshStudents}
+        />
+      )}
     </div>
   )
 }

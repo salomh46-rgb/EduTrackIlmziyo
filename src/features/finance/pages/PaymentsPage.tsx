@@ -47,6 +47,8 @@ import type {
 } from '@/features/finance/types'
 import { PaymentReceiptModal } from '@/features/finance/components/PaymentReceiptModal'
 import { NewPaymentModal } from '@/features/finance/components/NewPaymentModal'
+import { TelegramDebtorReminderModal } from '@/features/finance/components/TelegramDebtorReminderModal'
+import { exportDebtorsToCsv } from '@/features/students/utils/studentCsvHelper'
 
 type TabType = 'all' | 'debtors' | 'analytics'
 
@@ -80,6 +82,8 @@ export function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
   const [receiptPayment, setReceiptPayment] = useState<PaymentRecord | null>(null)
   const [newPaymentOpen, setNewPaymentOpen] = useState(false)
   const [selectedStudentForPayment, setSelectedStudentForPayment] = useState<string | null>(null)
+  const [telegramModalOpen, setTelegramModalOpen] = useState(false)
+  const [targetTelegramDebtor, setTargetTelegramDebtor] = useState<DebtSummary | null>(null)
 
   // Load finance data
   const loadFinanceData = async () => {
@@ -487,16 +491,44 @@ export function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
       {/* Tab 2: Debtors List */}
       {activeTab === 'debtors' && (
         <div className="space-y-4">
-          <Card className="p-4 bg-rose-500/5 border-rose-500/20">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />
-              <p className="text-xs text-rose-400 font-medium">
-                Ushbu ro'yxatda to'lov muddati o'tgan yoki to'lanmagan qarzdorlikka ega bo'lgan
-                o'quvchilar jamlangan. Siz ularga to'lov havolasini yuborishingiz yoki kassaga to'lov
-                qabul qilishingiz mumkin.
-              </p>
+          {/* Debtors Action Bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <Card className="p-4 bg-rose-500/5 border-rose-500/20 flex-1">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-rose-500 shrink-0" />
+                <p className="text-xs text-rose-400 font-medium">
+                  Ushbu ro'yxatda to'lov muddati o'tgan yoki to'lanmagan qarzdorlikka ega bo'lgan
+                  o'quvchilar jamlangan. Siz ularga Telegram orqali ommaviy eslatma jo'natishingiz yoki
+                  to'lov qabul qilishingiz mumkin.
+                </p>
+              </div>
+            </Card>
+
+            <div className="flex items-center gap-2 shrink-0 justify-end">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => exportDebtorsToCsv(debtors)}
+                disabled={debtors.length === 0}
+                className="rounded-2xl text-xs font-bold"
+              >
+                <Download className="mr-1.5 h-3.5 w-3.5 text-emerald-500" />
+                Qarzdorlar (CSV)
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  setTargetTelegramDebtor(null)
+                  setTelegramModalOpen(true)
+                }}
+                disabled={debtors.length === 0}
+                className="bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold rounded-2xl text-xs shadow-md shadow-sky-500/20"
+              >
+                <Send className="mr-1.5 h-3.5 w-3.5" />
+                Barchasiga Telegram Eslatma Yuborish
+              </Button>
             </div>
-          </Card>
+          </div>
 
           {loading ? (
             <LoadingState title="Qarzdorlar yuklanmoqda..." />
@@ -516,7 +548,7 @@ export function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
                       <th className="px-5 py-3.5">Telefon</th>
                       <th className="px-5 py-3.5">Jami Qarz</th>
                       <th className="px-5 py-3.5">Holat & Kechikish</th>
-                      <th className="px-5 py-3.5 text-right">Amal</th>
+                      <th className="px-5 py-3.5 text-right">Amallar</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[rgb(var(--border))] text-[rgb(var(--text))]">
@@ -545,17 +577,33 @@ export function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
                           )}
                         </td>
                         <td className="px-5 py-4 text-right">
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedStudentForPayment(debtor.student_id)
-                              setNewPaymentOpen(true)
-                            }}
-                            className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-sm"
-                          >
-                            To'lov qilish
-                          </Button>
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => {
+                                setTargetTelegramDebtor(debtor)
+                                setTelegramModalOpen(true)
+                              }}
+                              className="rounded-xl text-xs font-bold hover:border-sky-500/40 hover:text-sky-400"
+                              title="Ushbu o'quvchiga Telegram orqali eslatma yuborish"
+                            >
+                              <Send className="mr-1 h-3.5 w-3.5 text-sky-400" />
+                              Telegram
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedStudentForPayment(debtor.student_id)
+                                setNewPaymentOpen(true)
+                              }}
+                              className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-sm"
+                            >
+                              To'lov qilish
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -672,6 +720,18 @@ export function PaymentsPage({ initialTab = 'all' }: PaymentsPageProps) {
         onSubmitPayment={handleRecordPayment}
         students={studentsList}
         organizationId={organization?.id ?? ''}
+      />
+
+      {/* Telegram Debtor Reminder Modal with Template Generator */}
+      <TelegramDebtorReminderModal
+        isOpen={telegramModalOpen}
+        onClose={() => {
+          setTelegramModalOpen(false)
+          setTargetTelegramDebtor(null)
+        }}
+        debtors={debtors}
+        targetDebtor={targetTelegramDebtor}
+        centerName={organization?.name ?? 'EduTrack Ilm Ziyo'}
       />
     </div>
   )
