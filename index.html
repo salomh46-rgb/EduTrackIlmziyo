@@ -1,13 +1,24 @@
 <!doctype html>
-<html lang="en">
+<html lang="uz">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
     <meta
       name="description"
-      content="EduTrackIlmziyo is a tutoring center CRM and student management system."
+      content="EduTrack Ilmziyo — Zamonaviy o'quv markazlari va ta'lim muassasalari CRM tizimi."
     />
-    <title>EduTrackIlmziyo</title>
+    <title>EduTrack Ilmziyo — Ta'lim CRM</title>
+
+    <!-- PWA & Mobile Web App Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0284c7" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="EduTrack" />
+    <link rel="apple-touch-icon" href="/icons/icon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -18,6 +29,19 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+              console.log('EduTrack ServiceWorker registered with scope:', registration.scope);
+            })
+            .catch((err) => {
+              console.warn('EduTrack ServiceWorker registration failed:', err);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
-

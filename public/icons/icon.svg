@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c1222"/>
+      <stop offset="50%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+
+    <!-- Cyan to Indigo Primary Neon Gradient -->
+    <linearGradient id="neonPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="45%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+
+    <!-- Cap Top Facet Bright Gradient -->
+    <linearGradient id="capFacetTop" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+
+    <!-- Cap Underbody Gradient -->
+    <linearGradient id="capUnderbody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <!-- Orbital Glow Gradient 1 -->
+    <linearGradient id="orbitGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#4facfe" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <!-- Orbital Glow Gradient 2 -->
+    <linearGradient id="orbitGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.8"/>
+    </linearGradient>
+
+    <!-- Tassel Neon Amber/Gold Gradient -->
+    <linearGradient id="tasselGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+
+    <!-- High-Intensity Glow Filter -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Soft Ambient Light Filter -->
+    <filter id="ambientGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="24" result="blur"/>
+    </filter>
+
+    <!-- Specular Drop Shadow -->
+    <filter id="subtleShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#0284c7" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Base App Icon Rounded Square Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  <rect width="510" height="510" x="1" y="1" rx="111" fill="none" stroke="rgba(56, 189, 248, 0.2)" stroke-width="2"/>
+
+  <!-- Ambient Color Fog Behind Cap -->
+  <circle cx="256" cy="245" r="140" fill="#0284c7" opacity="0.25" filter="url(#ambientGlow)"/>
+  <circle cx="220" cy="270" r="100" fill="#6366f1" opacity="0.3" filter="url(#ambientGlow)"/>
+
+  <!-- Neon Orbital Rings (Quantum Education Energy) -->
+  <!-- Orbit 1: Tilted Left-Right -->
+  <g transform="rotate(-24 256 256)">
+    <ellipse cx="256" cy="256" rx="195" ry="68" fill="none" stroke="url(#orbitGrad1)" stroke-width="3.5" stroke-dasharray="8 6 42 6 12 8" filter="url(#neonGlow)"/>
+    <!-- Orbital Energy Sparks -->
+    <circle cx="448" cy="256" r="4.5" fill="#38bdf8" filter="url(#neonGlow)"/>
+    <circle cx="64" cy="256" r="3.5" fill="#818cf8" filter="url(#neonGlow)"/>
+  </g>
+
+  <!-- Orbit 2: Tilted Counter-Angle -->
+  <g transform="rotate(32 256 256)">
+    <ellipse cx="256" cy="256" rx="180" ry="58" fill="none" stroke="url(#orbitGrad2)" stroke-width="2.5" stroke-dasharray="14 10 70 12" filter="url(#neonGlow)"/>
+    <!-- Orbital Energy Spark -->
+    <circle cx="256" cy="198" r="4" fill="#a855f7" filter="url(#neonGlow)"/>
+    <circle cx="256" cy="314" r="3" fill="#06b6d4" filter="url(#neonGlow)"/>
+  </g>
+
+  <!-- Isometric Graduate Cap Geometry -->
+  <g filter="url(#subtleShadow)">
+    <!-- Cap Skull Base / Skull Band -->
+    <path d="M 188 275 L 188 322 C 188 352 324 352 324 322 L 324 275 Z" fill="url(#capUnderbody)" stroke="rgba(56, 189, 248, 0.4)" stroke-width="2.5"/>
+
+    <!-- Subtle Under-Rim Ambient Line -->
+    <path d="M 194 324 C 220 342 292 342 318 324" fill="none" stroke="#38bdf8" stroke-width="3" opacity="0.8" filter="url(#neonGlow)"/>
+
+    <!-- Diamond Mortarboard (Top Facet) -->
+    <!-- Center: 256, 230. Left: 110, 225. Top: 256, 155. Right: 402, 225. Bottom: 256, 275 -->
+    <path d="M 256 155 L 404 225 L 256 285 L 108 225 Z" fill="url(#capFacetTop)"/>
+
+    <!-- Specular Highlight Facet Lines (2026 Crystal Precision) -->
+    <!-- Top-Right Facet (Glossy sheen) -->
+    <path d="M 256 155 L 404 225 L 256 285 Z" fill="rgba(255, 255, 255, 0.12)"/>
+    <!-- Top-Left Facet (Cyan glow) -->
+    <path d="M 256 155 L 108 225 L 256 285 Z" fill="rgba(6, 182, 212, 0.25)"/>
+
+    <!-- Mortarboard Perimeter Neon Rim -->
+    <path d="M 256 155 L 404 225 L 256 285 L 108 225 Z" fill="none" stroke="#bae6fd" stroke-width="3.5" filter="url(#neonGlow)"/>
+
+    <!-- Top Cap Button / Pivot -->
+    <ellipse cx="256" cy="223" rx="10" ry="7" fill="#ffffff" filter="url(#neonGlow)"/>
+
+    <!-- Dynamic Neon Cyber Tassel -->
+    <path d="M 256 225 C 285 228 320 250 338 280 C 344 290 348 305 348 326" fill="none" stroke="url(#tasselGrad)" stroke-width="4.5" stroke-linecap="round" filter="url(#neonGlow)"/>
+    <!-- Tassel Ring & Fringe -->
+    <circle cx="348" cy="328" r="5" fill="#fbbf24"/>
+    <path d="M 345 332 L 343 355 M 348 332 L 348 358 M 351 332 L 353 355" stroke="url(#tasselGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Central Star of Knowledge / Apex Spark -->
+  <g transform="translate(256, 155)">
+    <circle cx="0" cy="0" r="4" fill="#ffffff" filter="url(#neonGlow)"/>
+  </g>
+
+  <!-- Brand Accents: Subtle Tech Matrix Nodes -->
+  <circle cx="140" cy="140" r="2.5" fill="#38bdf8" opacity="0.4"/>
+  <circle cx="372" cy="140" r="2.5" fill="#818cf8" opacity="0.4"/>
+  <circle cx="140" cy="380" r="2.5" fill="#818cf8" opacity="0.4"/>
+  <circle cx="372" cy="380" r="2.5" fill="#38bdf8" opacity="0.4"/>
+</svg>

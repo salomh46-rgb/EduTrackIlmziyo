@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from '@/app/shell/Sidebar'
 import { Topbar } from '@/app/shell/Topbar'
 import { PageContainer } from '@/components/PageContainer'
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -25,6 +26,8 @@ export function AppShell() {
           </PageContainer>
         </main>
       </div>
+
+      <PWAInstallPrompt />
     </div>
   )
 }

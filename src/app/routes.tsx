@@ -16,6 +16,12 @@ import { ParentsPage } from '@/features/parents/pages/ParentsPage'
 import { ParentDetailPage } from '@/features/parents/pages/ParentDetailPage'
 import { TeachersPage } from '@/features/teachers/pages/TeachersPage'
 import { TeacherDetailPage } from '@/features/teachers/pages/TeacherDetailPage'
+import { ParentPortalPage } from '@/features/parent-portal'
+import { PaymentsPage } from '@/features/finance/pages/PaymentsPage'
+import { GroupsPage } from '@/features/groups/pages/GroupsPage'
+import { GroupDetailPage } from '@/features/groups/pages/GroupDetailPage'
+import { AttendancePage } from '@/features/attendance/pages/AttendancePage'
+import { ExamsPage } from '@/features/exams/pages/ExamsPage'
 
 function DashboardRedirect() {
   const { role } = useAuth()
@@ -46,6 +52,7 @@ export function AppRoutes() {
           </RequireAuth>
         }
       />
+      <Route path="/parent-portal" element={<ParentPortalPage />} />
       <Route
         element={
           <RequireAuth>
@@ -104,8 +111,69 @@ export function AppRoutes() {
             </RequireRole>
           }
         />
+        <Route
+          path="/payments"
+          element={
+            <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+              <PaymentsPage initialTab="all" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/debtors"
+          element={
+            <RequireRole allowedRoles={['OWNER', 'ADMIN']}>
+              <PaymentsPage initialTab="debtors" />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/groups"
+          element={
+            <RequireRole allowedRoles={['OWNER', 'ADMIN', 'TEACHER']}>
+              <GroupsPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/groups/:groupId"
+          element={
+            <RequireRole allowedRoles={['OWNER', 'ADMIN', 'TEACHER']}>
+              <GroupDetailPage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/attendance"
+          element={
+            <RequireRole allowedRoles={['OWNER', 'ADMIN', 'TEACHER']}>
+              <AttendancePage />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/exams"
+          element={
+            <RequireRole allowedRoles={['OWNER', 'ADMIN', 'TEACHER']}>
+              <ExamsPage />
+            </RequireRole>
+          }
+        />
         {moduleRoutes
-          .filter((route) => !['/dashboard', '/students', '/parents', '/teachers'].includes(route.path))
+          .filter(
+            (route) =>
+              ![
+                '/dashboard',
+                '/students',
+                '/parents',
+                '/teachers',
+                '/payments',
+                '/debtors',
+                '/groups',
+                '/attendance',
+                '/exams',
+              ].includes(route.path),
+          )
           .map((route) => (
             <Route
               key={route.path}

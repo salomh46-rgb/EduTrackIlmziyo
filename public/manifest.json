@@ -1,0 +1,37 @@
+{
+  "name": "EduTrack Ilmziyo — Ta'lim CRM",
+  "short_name": "EduTrack",
+  "description": "EduTrack Ilmziyo — Zamonaviy o'quv markazlari va ta'lim muassasalari CRM tizimi",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#0284c7",
+  "orientation": "portrait-primary",
+  "lang": "uz",
+  "categories": [
+    "education",
+    "productivity",
+    "business"
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

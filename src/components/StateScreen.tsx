@@ -1,16 +1,29 @@
 import type { ReactNode } from 'react'
 import { Card } from '@/components/Card'
+import { Badge } from '@/components/Badge'
 import { cn } from '@/lib/cn'
 
 type StateScreenProps = {
   title: string
-  description: string
+  description?: string
+  badge?: string
   icon?: ReactNode
   actions?: ReactNode
+  action?: ReactNode
   className?: string
 }
 
-export function StateScreen({ title, description, icon, actions, className }: StateScreenProps) {
+export function StateScreen({
+  title,
+  description,
+  badge,
+  icon,
+  action,
+  actions,
+  className,
+}: StateScreenProps) {
+  const renderedActions = action ?? actions
+
   return (
     <div className={cn('grid min-h-[calc(100vh-2rem)] place-items-center px-4 py-10', className)}>
       <Card className="w-full max-w-xl space-y-6 text-center">
@@ -20,10 +33,17 @@ export function StateScreen({ title, description, icon, actions, className }: St
           </div>
         ) : null}
         <div className="space-y-2">
+          {badge ? (
+            <div className="flex justify-center">
+              <Badge variant="neutral">{badge}</Badge>
+            </div>
+          ) : null}
           <h1 className="text-2xl font-black tracking-tight">{title}</h1>
           <p className="text-sm leading-6 text-[rgb(var(--muted))]">{description}</p>
         </div>
-        {actions ? <div className="flex flex-wrap justify-center gap-3">{actions}</div> : null}
+        {renderedActions ? (
+          <div className="flex flex-wrap justify-center gap-3">{renderedActions}</div>
+        ) : null}
       </Card>
     </div>
   )

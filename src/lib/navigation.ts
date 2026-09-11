@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import {
+  AlertCircle,
   BarChart3,
   BookOpenText,
   CalendarCheck2,
@@ -127,10 +128,10 @@ export const moduleRoutes: ModuleRoute[] = [
     path: '/groups',
     icon: Layers3,
     description: 'Learning groups, schedules, and capacity.',
-    roles: ['OWNER', 'ADMIN'],
+    roles: allRoles,
     showInSidebar: true,
     sidebarGroup: 'management',
-    phaseLabel: 'Phase 6 - Groups',
+    phaseLabel: 'Phase 2 - Groups (Active)',
     focusAreas: ['Capacity', 'Schedules', 'Teacher assignment', 'Student membership'],
   },
   {
@@ -152,7 +153,7 @@ export const moduleRoutes: ModuleRoute[] = [
     roles: allRoles,
     showInSidebar: true,
     sidebarGroup: 'education',
-    phaseLabel: 'Phase 7 - Attendance',
+    phaseLabel: 'Phase 2 - Attendance (Active)',
     focusAreas: ['Bulk actions', 'Status capture', 'Filters', 'Notification queue integration'],
   },
   {
@@ -174,7 +175,7 @@ export const moduleRoutes: ModuleRoute[] = [
     roles: allRoles,
     showInSidebar: true,
     sidebarGroup: 'education',
-    phaseLabel: 'Phase 11 - Exams',
+    phaseLabel: 'Phase 2 - Exams (Active)',
     focusAreas: ['Exam creation', 'Scoring', 'Teacher comments', 'Performance snapshots'],
   },
   {
@@ -196,8 +197,19 @@ export const moduleRoutes: ModuleRoute[] = [
     roles: ['OWNER', 'ADMIN'],
     showInSidebar: true,
     sidebarGroup: 'finance',
-    phaseLabel: 'Phase 9 - Payments',
-    focusAreas: ['Invoices', 'Balances', 'Reminders', 'Telegram nudges'],
+    phaseLabel: 'Phase 3 - Fintech',
+    focusAreas: ['Invoices', 'Balances', 'Click & Payme', 'Receipts'],
+  },
+  {
+    label: 'Debtors',
+    path: '/debtors',
+    icon: AlertCircle,
+    description: 'Student overdue payments and debt tracking.',
+    roles: ['OWNER', 'ADMIN'],
+    showInSidebar: true,
+    sidebarGroup: 'finance',
+    phaseLabel: 'Phase 3 - Fintech',
+    focusAreas: ['Overdue balances', 'Debt tracking', 'Payment links', 'Nudges'],
   },
   {
     label: 'Analytics',
@@ -291,6 +303,10 @@ export function getRouteTitle(path: string): string {
     return 'Teacher detail'
   }
 
+  if (path.startsWith('/groups/')) {
+    return 'Group detail'
+  }
+
   if (path === '/account') {
     return 'Account'
   }
@@ -312,6 +328,10 @@ export function getRouteSection(path: string): string | null {
   }
 
   if (path.startsWith('/teachers/')) {
+    return 'Management'
+  }
+
+  if (path.startsWith('/groups/')) {
     return 'Management'
   }
 
