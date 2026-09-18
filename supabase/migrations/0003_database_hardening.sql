@@ -47,8 +47,16 @@ begin
 end $$;
 
 alter table public.parent_students
-  add column if not exists organization_id uuid,
+  add column if not exists organization_id uuid;
+
+alter table public.parent_students
+  alter column relation_type drop default;
+
+alter table public.parent_students
   alter column relation_type type public.student_relationship_type using upper(coalesce(relation_type, 'GUARDIAN'))::public.student_relationship_type;
+
+alter table public.parent_students
+  alter column relation_type set default 'GUARDIAN'::public.student_relationship_type;
 
 update public.parent_students ps
 set organization_id = p.organization_id
@@ -75,16 +83,26 @@ alter table public.group_students
 alter table public.lessons
   add column if not exists subject text,
   add column if not exists room text,
-  add column if not exists notes text not null default '';
+  add column if not exists notes text not null default '',
+  add column if not exists is_deleted boolean not null default false,
+  add column if not exists deleted_at timestamptz,
+  add column if not exists deleted_by uuid references public.profiles(id) on delete set null;
 
 update public.lessons
 set subject = coalesce(subject, title)
 where subject is null or subject = '';
 
 alter table public.lessons
-  alter column subject set not null,
-  alter column status type public.lesson_status using upper(status)::public.lesson_status,
-  alter column status set default 'SCHEDULED';
+  alter column subject set not null;
+
+alter table public.lessons
+  alter column status drop default;
+
+alter table public.lessons
+  alter column status type public.lesson_status using upper(status)::public.lesson_status;
+
+alter table public.lessons
+  alter column status set default 'SCHEDULED'::public.lesson_status;
 
 alter table public.lessons
   add constraint lessons_end_after_start check (ends_at is null or ends_at > starts_at);
@@ -402,7 +420,7 @@ using (
     where viewer.profile_id = auth.uid()
       and viewer.status = 'ACTIVE'
       and viewer.role in ('OWNER', 'ADMIN')
-      and target.profile_id = id
+      and target.profile_id = profiles.id
       and target.status = 'ACTIVE'
   )
 );
@@ -420,7 +438,7 @@ using (
     where viewer.profile_id = auth.uid()
       and viewer.status = 'ACTIVE'
       and viewer.role in ('OWNER', 'ADMIN')
-      and target.profile_id = id
+      and target.profile_id = profiles.id
       and target.status = 'ACTIVE'
   )
 )
@@ -433,7 +451,7 @@ with check (
     where viewer.profile_id = auth.uid()
       and viewer.status = 'ACTIVE'
       and viewer.role in ('OWNER', 'ADMIN')
-      and target.profile_id = id
+      and target.profile_id = profiles.id
       and target.status = 'ACTIVE'
   )
 );
